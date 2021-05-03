@@ -17,15 +17,14 @@ namespace GreenLeaves.Core.SendGrid {
             _logger = logger;
         }
         #endregion
-        public async Task<bool> SendMailAsync( string key, string address, string message, string subject, string mailAddress ) {
+        public async Task<bool> SendMailAsync( string key, string address, string message, string subject, List<string> recipients ) {
             SendGridClient client = new SendGridClient( key );
             EmailAddress from = new EmailAddress( address );
 
-            EmailAddress to = new EmailAddress() {
-                Email = mailAddress
-            };
+            List<EmailAddress> tos = new List<EmailAddress>();
+            recipients.ForEach( x => tos.Add( new EmailAddress { Email = x } ) );
 
-            var msg = MailHelper.CreateSingleEmail( from, to, subject, null, message );
+            var msg = MailHelper.CreateSingleEmailToMultipleRecipients( from, tos, subject, null, message );
             try {
                 await client.SendEmailAsync( msg );
                 return true;

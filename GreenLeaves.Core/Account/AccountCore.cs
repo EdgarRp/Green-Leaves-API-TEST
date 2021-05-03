@@ -35,11 +35,13 @@ namespace GreenLeaves.Core.Account {
         public async Task<bool> SendMail( UserMailViewModel model ) {
             #region Vars
             string key, content_mail, web_root, path;
+            List<string> mails;
             #endregion
 
             #region Initilize vars
             //Esto no es recomendado, pero para no crear tablas y y hacer mas consultas de configuración lo dejo de momento en el .json
             key = _config [ "KeySendGrid" ];
+            mails = new List<string>();
 
             web_root = _enviroment.WebRootPath;
             path =  web_root +  V_Constants.MAIL_PATH ;
@@ -47,11 +49,14 @@ namespace GreenLeaves.Core.Account {
             #endregion
 
             #region Prepare return
+            mails.Add( model.Email );
+            mails.Add( _config [ "DefaultAdress" ] );
+
             content_mail = content_mail.Replace( V_Constants.REPLACE_EMAIL_DATA, model.Email );
             content_mail = content_mail.Replace( V_Constants.REPLACE_NAME_DATA, model.Name );
             content_mail = content_mail.Replace( V_Constants.REPLACE_DATE_DATA, model.Date.ToShortDateString() );
             content_mail = content_mail.Replace( V_Constants.REPLACE_CITY_DATA, model.City );
-            return await _send.SendMailAsync( key, V_Constants.MAIL_ADDRESS, content_mail, V_Constants.SUB_MAIL, model.Email );
+            return await _send.SendMailAsync( key, V_Constants.MAIL_ADDRESS, content_mail, V_Constants.SUB_MAIL,  mails);
             #endregion
         }
 
